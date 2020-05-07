@@ -1,0 +1,209 @@
+﻿<Window x:Class="TpSrsComparer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:converters="clr-namespace:TpSrsComparer.Converters"
+        xmlns:common="clr-namespace:TpSrsComparer.Common"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="{Binding Title}" Height="616.432" Width="1000" Icon="/TpSrsComparer;component/bull.ico">
+    <Window.Resources>
+        <converters:ComparedTypeConverter x:Key="ComparedTypeConverter" />
+        <converters:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter" />
+        <Storyboard x:Key="Storyboard" AutoReverse="False" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
+                <EasingDoubleKeyFrame KeyTime="0:0:1" Value="360" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+
+    </Window.Resources>
+    <Grid Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="5"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF994C0D" Offset="0"/>
+                    <GradientStop Color="#FF9E7824" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Label Foreground="#FFF1F1F1" Content="{Binding SubTitle}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0" FontWeight="Bold" FontSize="18"  />
+        </Border>
+        <Border Background="#FF5F5F5F" Grid.Row="1"></Border>
+        <Grid Margin="5" Grid.Row="2">
+            <Grid.RowDefinitions> 
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="257*" />
+            </Grid.RowDefinitions>
+ 
+            <GroupBox Header="Enter" Background="#F7F7F7">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="10" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="30" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="60" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0">SRS file:</TextBlock>
+                    <TextBlock Grid.Row="2">TP file:</TextBlock>
+                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SrsFile}" />
+                    <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding PtFile}" />
+                    <Button Grid.Row="0" Grid.Column="4" Command="{Binding PickSrsFileCommand}">...</Button>
+                    <Button Grid.Row="2" Grid.Column="4" Command="{Binding PickPtFileCommand}">...</Button>
+                    <Button Grid.Row="0" Grid.Column="6" Grid.RowSpan="3" Background="#FF47F136" Command="{Binding CompareCommand}">Compare</Button>
+                </Grid>
+            </GroupBox>
+            <Grid Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="10*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="10*" />
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Header="Results" Background="#F7F7F7">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ListView Name="TListView" BorderThickness="0,1" common:ListViewSortHelper.SortEnabled="True" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding CompareView.View}">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Foreground" Value="#FF008000" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="OnlyLeft" Binding="{Binding ComparedType}">
+                                            <Setter Property="Foreground" Value="#FFFF0000" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
+                                        <ItemContainerTemplate>
+                                            <Border Background="#999595" Padding="2" BorderBrush="#FF000000" BorderThickness="0,0,0,1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1*" />
+                                                        <ColumnDefinition Width="auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <DockPanel>
+                                                        <TextBlock Text="{Binding Path=ItemCount}" />
+                                                        <TextBlock FontWeight="Bold" Margin="20,0,20,0" Text="{Binding Path=Name, Converter={StaticResource ComparedTypeConverter}}" />
+                                                    </DockPanel>
+                                                </Grid>
+                                            </Border>
+                                        </ItemContainerTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ItemsControl.GroupStyle>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Item" Width="130" common:ListViewSortHelper.SortProperty="Name" DisplayMemberBinding="{Binding Name}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <GroupBox Header="Filter" Grid.Row="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0">Word</TextBlock>
+                                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding FilterWord, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+                <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
+                <GroupBox Grid.Column="2" Header="Software Requirement Specifications" Background="#F7F7F7">
+                    <DocumentViewer Name="SrsViewer" ShowPageBorders="False" Document="{Binding CurrentSrsDocument}">
+                        <FrameworkElement.Resources>
+                            <ResourceDictionary>
+                                <Style x:Key="{x:Type ContentControl}" TargetType="{x:Type ContentControl}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Name" Value="PART_FindToolBarHost">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ResourceDictionary>
+                        </FrameworkElement.Resources>
+                    </DocumentViewer>
+                </GroupBox>
+                <GridSplitter Grid.Column="3" Width="6" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
+                <GroupBox Grid.Column="4" Header="Test Protocol" Background="#F7F7F7">
+                    <DocumentViewer Name="TpViewer" ShowPageBorders="False" Document="{Binding CurrentTpDocument}">
+                        <FrameworkElement.Resources>
+                            <ResourceDictionary>
+                                <Style x:Key="{x:Type ContentControl}" TargetType="{x:Type ContentControl}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Name" Value="PART_FindToolBarHost">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ResourceDictionary>
+                        </FrameworkElement.Resources>
+                    </DocumentViewer>
+                </GroupBox>
+            </Grid>
+        </Grid>
+        <Border Grid.Row="0" Grid.RowSpan="10" Grid.Column="0" Grid.ColumnSpan="10" Background="#7A848484" Visibility="{Binding IsBusy, Converter={StaticResource Bool2VisibilityConverter}}">
+            <Grid>
+                <Border Width="80" Height="80" Background="#D8403F3F" CornerRadius="10">
+                    <Path Name="path" Data="M26.564133,0.5 L26.841228,0.69208789 C30.568541,3.3427218 33,7.6968701 33,12.618918 C33,20.696129 26.452164,27.244001 18.375,27.244001 C10.297835,27.244001 3.7500004,20.696129 3.7499998,12.618918 C3.7500001,11.968166 3.7925018,11.327342 3.8748807,10.699069 L3.898989,10.529458 L0.5,10.57733 L7,6.4109996 L12.333333,10.410666 L9.5022683,10.450539 L9.5034709,10.560085 C9.6489272,17.179483 14.348662,22.493975 20.125,22.493975 C25.993025,22.493975 30.75,17.00943 30.75,10.243906 C30.75,6.3325866 29.160084,2.8494087 26.684736,0.60660774" Fill="#FF94CECA" Height="27.744" Stretch="Fill" Width="33.5" RenderTransformOrigin="0.5,0.5">
+                        <UIElement.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform />
+                                <SkewTransform />
+                                <RotateTransform />
+                                <TranslateTransform />
+                            </TransformGroup>
+                        </UIElement.RenderTransform>
+                        <FrameworkElement.Style>
+                            <Style>
+                                <Style.Triggers>
+                                    <Trigger Property="UIElement.Visibility" Value="Visible">
+                                        <TriggerBase.EnterActions>
+                                            <BeginStoryboard Name="StoryboardSave" Storyboard="{StaticResource Storyboard}" />
+                                        </TriggerBase.EnterActions>
+                                        <TriggerBase.ExitActions>
+                                            <StopStoryboard BeginStoryboardName="StoryboardSave" />
+                                        </TriggerBase.ExitActions>
+                                    </Trigger>
+                                    <Trigger Property="UIElement.Visibility" Value="Hidden">
+                                        <TriggerBase.EnterActions>
+                                            <StopStoryboard BeginStoryboardName="StoryboardSave" />
+                                        </TriggerBase.EnterActions>
+                                        <TriggerBase.ExitActions>
+                                            <StopStoryboard BeginStoryboardName="StoryboardSave" />
+                                        </TriggerBase.ExitActions>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </FrameworkElement.Style>
+                    </Path>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
