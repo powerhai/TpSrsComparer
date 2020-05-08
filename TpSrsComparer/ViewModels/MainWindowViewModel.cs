@@ -54,7 +54,7 @@ namespace TpSrsComparer.ViewModels
 
         private bool mIsBusy1;
 
-        private readonly Regex mLeftRegex = new Regex("[\\{｛]\\s*([a-zA-Z]+[\\-_]+[a-zA-Z0-9]+)\\s*[\\}｝]");
+        private readonly Regex mLeftRegex = new Regex("[\\{｛]\\s*([a-zA-Z]+[\\-_]*[a-zA-Z0-9]+)\\s*[\\}｝]");
 
         private readonly string mLeftTempFile = "left.xps";
 
@@ -64,7 +64,7 @@ namespace TpSrsComparer.ViewModels
 
         private string mPtFile;
 
-        private readonly Regex mRightRegex = new Regex("\\s*([a-zA-Z]+[\\-_]+[a-zA-Z0-9]+)\\s*");
+        private readonly Regex mRightRegex = new Regex("\\s*([a-zA-Z]+[\\-_]*[a-zA-Z0-9]+)\\s*");
 
         private string mRightTempFile = "right.xps";
 
